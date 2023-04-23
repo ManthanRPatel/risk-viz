@@ -1,14 +1,14 @@
 import React from "react";
 import { useState, useEffect } from "react";
-// import { MapContainer, Marker, TileLayer } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Tooltip } from 'react-leaflet';
 import "leaflet/dist/leaflet.css";
 // import Map from "../components/Map";
 import dynamic from 'next/dynamic';
 
 
-const Map = dynamic(() => import('../components/Map'), {
-  ssr: false
-});
+// const Map = dynamic(() => import('../components/Map'), {
+//   ssr: false
+// });
 
 const Problem1 = () => {
   const position = [51.505, -0.09];
@@ -23,8 +23,8 @@ const Problem1 = () => {
   const [selectedDecade, setSelectedDecade] = useState(decadeOptions[0].value);
 
   const [data, setData] = useState<any[]>([]);
+  const [filteredData, setfilteredData] = useState<any[]>([]);
 
-  const filteredData = data.filter((asset) => asset.year === selectedDecade);
 
   useEffect(() => {
     setMounted(true);
@@ -32,11 +32,34 @@ const Problem1 = () => {
       .then((response) => response.json())
       .then((data) => {
         setData(data.data);
+        const getData = data.data.filter((asset: any) => asset.year == selectedDecade)
+        setfilteredData(getData);
       })
       .catch((error) => {
         console.error(error);
       });
   }, []);
+
+  useEffect(()=>{
+
+    const getData = data.filter((asset: any) => asset.year == selectedDecade)
+    setfilteredData(getData);
+
+  },[selectedDecade])
+
+  console.log("filteredData ", filteredData);
+
+  function getMarkerColor(riskRating: number) {
+    if (riskRating >= 0.8) {
+      return 'red';
+    } else if (riskRating >= 0.6) {
+      return 'orange';
+    } else if (riskRating >= 0.4) {
+      return 'yellow';
+    } else {
+      return 'green';
+    }
+  }
 
   if (!mounted) {
     return null;
@@ -79,7 +102,20 @@ const Problem1 = () => {
               ))}
             </select>
           </div>
-          <Map decade={selectedDecade} data={data} />
+          <MapContainer center={[46.1351, -60.1831]} zoom={5}  style={{ height: "450px", width: "700px" }}>
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        {filteredData && filteredData.length>0 && filteredData.map((item, idx) => (
+          <Marker key={idx} position={[item.lat, item.long]} color={getMarkerColor(item.riskRating)}>
+            <Popup>
+              <div>{item.asset_name}</div>
+              <div>{item.business_category}</div>
+              <div>Risk Rating: {item.risk_rating}</div>
+            </Popup>
+            <Tooltip>{`${item.asset_name}, ${item.business_category}`}</Tooltip>
+          </Marker>
+        ))}
+      </MapContainer>
+          {/* <Map decade={selectedDecade} data={data} /> */}
           {/* <Map data={filteredData} /> */}
         </div>
       </div>

@@ -76,7 +76,7 @@ const Problem2 = () => {
           {sortedData && sortedData.length > 0 && sortedData.map((row, index) => (
             <tr key={index}>
               {columns.map((columnName) => (
-                <td key={columnName}>{row[columnName]}</td>
+                <td key={columnName}>{row[columnName.toLowerCase().replace(/ /g, '_')]}</td>
               ))}
             </tr>
           ))}
