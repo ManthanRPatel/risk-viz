@@ -1,0 +1,35 @@
+body {
+	background: white;
+	font-family: system-ui;
+}
+
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #1a1a1a;
+    color: #fff;
+}
+  
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  th {
+    background-color: #444;
+    color: #fff;
+    cursor: pointer;
+  }
+  
+  tr:hover {
+    background-color: #333;
+  }
+  
+  td:first-child {
+    color: #999;
+  }
+  

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 // import {getData} from '../src/app/api/data';
+import './css/table.css';
 
 const Problem2 = () => {
   const [columns, setColumns] = useState<string[]>([]);
@@ -53,12 +54,22 @@ const Problem2 = () => {
 
   }, [data, sortOrder, sortColumn]);
 
+  const columnsName = [
+    { label: "Asset", value: "asset_name" },
+    { label: "Lat", value: "lat" },
+    { label: "Long", value: "long" },
+    { label: "Business Category", value: "business_category" },
+    { label: "Risk Rating", value: "risk_rating" },
+    { label: "Risk Factors", value: "risk_factors" },
+    { label: "Year", value: "year" },
+  ]
+
   return (
     <div>
       <h1>Data Table</h1>
       <table>
         <thead>
-          <tr>
+          {/* <tr>
             {columns.map((columnName) => (
               <th key={columnName} onClick={() => handleSort(columnName)}>
                 {columnName}
@@ -69,6 +80,19 @@ const Problem2 = () => {
                   <span> ▼</span>
                 )}
               </th>
+            ))}
+          </tr> */}
+          <tr>
+            {columnsName.map(ele=>(
+              <th key={ele.value} onClick={() => handleSort(ele.value)}>
+              {ele.label}
+              {sortColumn === ele.value && sortOrder === "asc" && (
+                  <span>▲</span>
+              )}
+              {sortColumn === ele.value && sortOrder === "desc" && (
+                <span>▼</span>
+              )}
+            </th>
             ))}
           </tr>
         </thead>
