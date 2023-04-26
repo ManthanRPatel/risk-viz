@@ -22,8 +22,8 @@ const Home = () => {
   const [businessCategories, setBusinessCategories] = useState<any[]>([]);
   const [assets, setAssets] = useState<any[]>([]);
 
-  const [selectedDecade, setSelectedDecade] = useState(null);
-  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [selectedDecade, setSelectedDecade] = useState<any>(null);
+  const [selectedLocation, setSelectedLocation] = useState<any>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -31,17 +31,9 @@ const Home = () => {
       .then((response) => response.json())
       .then((data) => {
         setData(data.data);
-        const uniqueYears = [
-          ...new Set(data.data.map((item: { year: any }) => item.year)),
-        ].sort((a, b) => a - b);
-        const uniqueAssets = [
-          ...new Set(data.data.map((item: { year: any }) => item.asset_name)),
-        ].sort();
-        const uniqueBusinessCategories = [
-          ...new Set(
-            data.data.map((item: { year: any }) => item.business_category)
-          ),
-        ].sort();
+        const uniqueYears = [ ...Array.from(new Set(data.data.map((item: any) => item.year)))].sort((a:any, b:any) => a - b);
+        const uniqueAssets = [ ...Array.from(new Set(data.data.map((item: any) => item.asset_name)))].sort((a:any, b:any) => a - b);
+        const uniqueBusinessCategories = [ ...Array.from(new Set(data.data.map((item: any) => item.business_category)))].sort((a:any, b:any) => a - b);
 
         setAssets(uniqueAssets);
         setBusinessCategories(uniqueBusinessCategories);

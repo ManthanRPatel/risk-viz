@@ -7,8 +7,9 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import "tailwindcss/tailwind.css";
+import { AnyRecord } from "dns";
 
-
+//@ts-ignore
 Chart.defaults.scale.category = {
   display: true,
   title: {
@@ -17,35 +18,39 @@ Chart.defaults.scale.category = {
   },
 };
 
-const Problem3 = (props) => {
+const Problem3 = (props:any) => {
   const { data, years, businessCategories, assets, selectedLocation } = props;
 
-  const [chartData, setChartData] = useState<any[]>([]);
+  const initialStateChartData = {
+    labels: [],
+    datasets: [
+      {
+        label: "Risk Rating Over Time",
+        data: [],
+        fill: false,
+        borderColor: "rgb(75, 192, 192)",
+        tension: 0.1,
+      },
+    ],
+  };
+
+  const [chartData, setChartData] = useState<any>(initialStateChartData);
   const [selectedAsset, setSelectedAsset] = useState<string>(""); // state for selected asset
   const [selectedBusinessCategory, setSelectedBusinessCategory] =
     useState<string>(""); // state for selected business category
 
-  const handleAssetChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleAssetChange = (event: any) => {
     setSelectedAsset(event.target.value);
 
     if (data && data.length > 0) {
       if (event.target.value !== "") {
         setSelectedBusinessCategory("");
-        var ChartdataSet = {
-          labels: [],
-          datasets: [
-            {
-              label: "Risk Rating Over Time",
-              data: [],
-              fill: false,
-              borderColor: "rgb(75, 192, 192)",
-              tension: 0.1,
-            },
-          ],
-        };
+        let ChartdataSet = initialStateChartData;
         data.forEach((ele: any) => {
           if (ele.asset_name == event.target.value) {
+            //@ts-ignore
             ChartdataSet.labels.push(parseInt(ele.year));
+            //@ts-ignore
             ChartdataSet.datasets[0].data.push(parseFloat(ele["risk_rating"]));
           }
         });
@@ -55,28 +60,19 @@ const Problem3 = (props) => {
   };
 
   const handleBusinessCategoryChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
+    event: any
   ) => {
     setSelectedBusinessCategory(event.target.value);
 
     if (data && data.length > 0) {
       if (event.target.value !== "") {
         setSelectedAsset("");
-        var ChartdataSet = {
-          labels: [],
-          datasets: [
-            {
-              label: "Risk Rating Over Time",
-              data: [],
-              fill: false,
-              borderColor: "rgb(75, 192, 192)",
-              tension: 0.1,
-            },
-          ],
-        };
+        var ChartdataSet = initialStateChartData;
         data.forEach((ele: any) => {
           if (ele.business_category == event.target.value) {
+            //@ts-ignore
             ChartdataSet.labels.push(parseInt(ele.year));
+           //@ts-ignore
             ChartdataSet.datasets[0].data.push(parseFloat(ele["risk_rating"]));
           }
         });
@@ -86,34 +82,7 @@ const Problem3 = (props) => {
   };
 
   useEffect(() => {
-    var ChartdataSet = {
-      labels: [],
-      datasets: [
-        {
-          label: "Risk Rating Over Time",
-          data: [],
-          fill: false,
-          borderColor: "rgb(75, 192, 192)",
-          tension: 0.1,
-        },
-      ],
-    };
-    setChartData(ChartdataSet);
-  }, []);
-
-  useEffect(() => {
-    var ChartdataSet = {
-      labels: [],
-      datasets: [
-        {
-          label: "Risk Rating Over Time",
-          data: [],
-          fill: false,
-          borderColor: "rgb(75, 192, 192)",
-          tension: 0.1,
-        },
-      ],
-    };
+    var ChartdataSet = initialStateChartData;
     if (data && data.length > 0) {
       if (selectedLocation) {
         data.forEach((ele: any) => {
@@ -121,7 +90,9 @@ const Problem3 = (props) => {
             Number(ele.lat) == selectedLocation[0] &&
             Number(ele.long) == selectedLocation[1]
           ) {
+            //@ts-ignore
             ChartdataSet.labels.push(parseInt(ele.year));
+            //@ts-ignore
             ChartdataSet.datasets[0].data.push(parseFloat(ele["risk_rating"]));
           }
         });
@@ -252,7 +223,11 @@ const Problem3 = (props) => {
         chartData &&
         data.length > 0 && (
           <>
-            <Line options={options} data={chartData} />
+            <Line 
+              //@ts-ignore
+              options={options} 
+              data={chartData} 
+            />
           </>
         )}
     </div>

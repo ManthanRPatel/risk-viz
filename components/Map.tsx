@@ -24,7 +24,15 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 //   ssr: false
 // });
 
-const Problem1 = (props) => {
+interface MapProps {
+  data: [];
+  years: [];
+  selectedDecade?: number;
+  setSelectedDecade: (value: string) => void;
+  setSelectedLocation: (value: []) => void;
+}
+
+const Problem1 = (props:any) => {
   const {
     data,
     years,
@@ -121,7 +129,7 @@ const Problem1 = (props) => {
                 <Marker
                   key={idx}
                   position={[item.lat, item.long]}
-                  color={getMarkerColor(item.riskRating)}
+                  // color={getMarkerColor(item.riskRating)}
                   eventHandlers={{ click: () => handleMarkerClick(item) }}
                   // icon={icon({
                   //   iconUrl: "/marker.png",
