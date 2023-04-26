@@ -167,7 +167,7 @@ const Problem3 = (props) => {
             data: { datasets: { [x: string]: any } }
           ) {
             if (data?.datasets) {
-              console.log("data?.datasets ", data?.datasets);
+              // console.log("data?.datasets ", data?.datasets);
               const dataset = data.datasets[tooltipItem.datasetIndex];
               const year = dataset.data[tooltipItem.index].x;
               const riskRating = dataset.data[tooltipItem.index].y;
@@ -185,7 +185,7 @@ const Problem3 = (props) => {
     },
   };
 
-  console.log("chartData", chartData);
+  // console.log("chartData", chartData);
 
   return (
     <div className="mt-6">

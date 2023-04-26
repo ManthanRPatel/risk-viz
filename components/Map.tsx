@@ -53,7 +53,7 @@ const Problem1 = (props) => {
     setFilteredData(getData);
   }, [data, selectedDecade]);
 
-  console.log("filteredData ", filteredData);
+  // console.log("filteredData ", filteredData);
 
   function getMarkerColor(riskRating: number) {
     if (riskRating >= 0.8) {

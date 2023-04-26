@@ -3,7 +3,7 @@ import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import "tailwindcss/tailwind.css";
 
 
-const Problem2 = (props) => {
+const Problem2 = (props:any) => {
   const { data, selectedDecade, selectedLocation } = props;
 
   const [sortedData, setSortedData] = useState<any[]>([]);
@@ -92,8 +92,8 @@ const Problem2 = (props) => {
       <DataGrid
         rows={sortedData}
         columns={columns}
-        pageSize={5}
-        rowsPerPageOptions={[5]}
+        // pageSize={5}
+        // rowsPerPageOptions={[5]}
       />
     </div>
       {/* <table>

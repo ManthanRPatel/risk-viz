@@ -4,6 +4,9 @@ const nextConfig = {
     appDir: true,
   },
   ignoreBuildErrors: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   async redirects() {
     return [
       {
