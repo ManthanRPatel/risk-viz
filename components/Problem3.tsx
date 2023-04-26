@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
 import Chart from "chart.js/auto";
 
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import "tailwindcss/tailwind.css";
 
 
 Chart.defaults.scale.category = {
@@ -17,89 +18,19 @@ Chart.defaults.scale.category = {
 };
 
 const Problem3 = (props) => {
+  const { data, years, businessCategories, assets, selectedLocation } = props;
 
-  const { years, businessCategories, assets} = props;
-  const [data, setData] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
-  const [selectedLatLang, setSelectedLatLang] = useState([
-    "42.8334",
-    "-80.38297",
-  ]);
-
-  const [selectedItem, setSelectedItem] = useState(null);
-
-  const [selectedLocation, setSelectedLocation] = useState<string>(""); // state for selected location
   const [selectedAsset, setSelectedAsset] = useState<string>(""); // state for selected asset
   const [selectedBusinessCategory, setSelectedBusinessCategory] =
     useState<string>(""); // state for selected business category
 
-    const handleLocationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-      setSelectedLocation(event.target.value);
-    };
-    
-    const handleAssetChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-      setSelectedAsset(event.target.value);
+  const handleAssetChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedAsset(event.target.value);
 
-      if(data && data.length > 0){
-        if(event.target.value !== ""){
-          setSelectedBusinessCategory("");
-          var ChartdataSet = {
-            labels: [],
-            datasets: [
-              {
-                label: "Risk Rating Over Time",
-                data: [],
-                fill: false,
-                borderColor: "rgb(75, 192, 192)",
-                tension: 0.1,
-              },
-            ],
-          };
-          data.forEach((ele: any) => {
-            if (ele.asset_name == event.target.value) {
-              ChartdataSet.labels.push(parseInt(ele.year));
-              ChartdataSet.datasets[0].data.push(parseFloat(ele["risk_rating"]));
-            }
-          });
-          setChartData(ChartdataSet);
-        }
-      }
-    };
-    
-    const handleBusinessCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-      setSelectedBusinessCategory(event.target.value);
-
-      if(data && data.length > 0){
-        if(event.target.value !== ""){
-          setSelectedAsset("");
-          var ChartdataSet = {
-            labels: [],
-            datasets: [
-              {
-                label: "Risk Rating Over Time",
-                data: [],
-                fill: false,
-                borderColor: "rgb(75, 192, 192)",
-                tension: 0.1,
-              },
-            ],
-          };
-          data.forEach((ele: any) => {
-            if (ele.business_category == event.target.value) {
-              ChartdataSet.labels.push(parseInt(ele.year));
-              ChartdataSet.datasets[0].data.push(parseFloat(ele["risk_rating"]));
-            }
-          });
-          setChartData(ChartdataSet);
-        }
-      }
-    };
-
-  useEffect(() => {
-    fetch("/api/data")
-      .then((response) => response.json())
-      .then((data) => {
-        setData(data.data);
+    if (data && data.length > 0) {
+      if (event.target.value !== "") {
+        setSelectedBusinessCategory("");
         var ChartdataSet = {
           labels: [],
           datasets: [
@@ -112,21 +43,49 @@ const Problem3 = (props) => {
             },
           ],
         };
-        data.data.forEach((ele: any) => {
-          if (Number(ele.lat) == 42.8334 && Number(ele.long) == -80.38297) {
+        data.forEach((ele: any) => {
+          if (ele.asset_name == event.target.value) {
             ChartdataSet.labels.push(parseInt(ele.year));
             ChartdataSet.datasets[0].data.push(parseFloat(ele["risk_rating"]));
           }
         });
         setChartData(ChartdataSet);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
+      }
+    }
+  };
 
-  useEffect(()=>{
+  const handleBusinessCategoryChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setSelectedBusinessCategory(event.target.value);
 
+    if (data && data.length > 0) {
+      if (event.target.value !== "") {
+        setSelectedAsset("");
+        var ChartdataSet = {
+          labels: [],
+          datasets: [
+            {
+              label: "Risk Rating Over Time",
+              data: [],
+              fill: false,
+              borderColor: "rgb(75, 192, 192)",
+              tension: 0.1,
+            },
+          ],
+        };
+        data.forEach((ele: any) => {
+          if (ele.business_category == event.target.value) {
+            ChartdataSet.labels.push(parseInt(ele.year));
+            ChartdataSet.datasets[0].data.push(parseFloat(ele["risk_rating"]));
+          }
+        });
+        setChartData(ChartdataSet);
+      }
+    }
+  };
+
+  useEffect(() => {
     var ChartdataSet = {
       labels: [],
       datasets: [
@@ -139,9 +98,37 @@ const Problem3 = (props) => {
         },
       ],
     };
+    setChartData(ChartdataSet);
+  }, []);
 
-    
-  },[selectedAsset,selectedBusinessCategory])
+  useEffect(() => {
+    var ChartdataSet = {
+      labels: [],
+      datasets: [
+        {
+          label: "Risk Rating Over Time",
+          data: [],
+          fill: false,
+          borderColor: "rgb(75, 192, 192)",
+          tension: 0.1,
+        },
+      ],
+    };
+    if (data && data.length > 0) {
+      if (selectedLocation) {
+        data.forEach((ele: any) => {
+          if (
+            Number(ele.lat) == selectedLocation[0] &&
+            Number(ele.long) == selectedLocation[1]
+          ) {
+            ChartdataSet.labels.push(parseInt(ele.year));
+            ChartdataSet.datasets[0].data.push(parseFloat(ele["risk_rating"]));
+          }
+        });
+        setChartData(ChartdataSet);
+      }
+    }
+  }, [selectedLocation]);
 
   const options = {
     scales: {
@@ -201,9 +188,20 @@ const Problem3 = (props) => {
   console.log("chartData", chartData);
 
   return (
-    <div>
-      <h1>Line Graph</h1>
-      <h2>Select a location, asset, or business category:</h2>
+    <div className="mt-6">
+      <div className="text-xl font-bold">Line Graph</div>
+      <div className="text-lg my-2">
+        {selectedAsset
+          ? "Selected Asset: " + selectedAsset
+          : selectedBusinessCategory
+          ? "Selected Business Category: " + selectedBusinessCategory
+          : selectedLocation && selectedLocation.length > 0
+          ? "Selected Location: " +
+            selectedLocation[0] +
+            "," +
+            selectedLocation[1]
+          : null}
+      </div>
 
       <FormControl sx={{ m: 1, minWidth: 80 }}>
         <InputLabel id="demo-simple-select-autowidth-label">Assets</InputLabel>
@@ -218,14 +216,18 @@ const Problem3 = (props) => {
           <MenuItem value="">
             <em>None</em>
           </MenuItem>
-          {assets.map((ele:string)=>(
-            <MenuItem key={ele} value={ele}>{ele}</MenuItem>
+          {assets.map((ele: string) => (
+            <MenuItem key={ele} value={ele}>
+              {ele}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>
 
       <FormControl sx={{ m: 1, width: 250 }}>
-        <InputLabel id="demo-simple-select-autowidth-label">Business Category</InputLabel>
+        <InputLabel id="demo-simple-select-autowidth-label">
+          Business Category
+        </InputLabel>
         <Select
           labelId="demo-simple-select-autowidth-label"
           id="demo-simple-select-autowidth"
@@ -237,16 +239,22 @@ const Problem3 = (props) => {
           <MenuItem value="">
             <em>None</em>
           </MenuItem>
-          {businessCategories.map((ele:string)=>(
-            <MenuItem key={ele} value={ele}>{ele}</MenuItem>
+          {businessCategories.map((ele: string) => (
+            <MenuItem key={ele} value={ele}>
+              {ele}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>
-    
+
       {/* Implement a form or dropdown menu to select the item */}
-      {chartData && data.length > 0 && (
-        <Line options={options} data={chartData} />
-      )}
+      {(selectedAsset || selectedBusinessCategory || selectedLocation) &&
+        chartData &&
+        data.length > 0 && (
+          <>
+            <Line options={options} data={chartData} />
+          </>
+        )}
     </div>
   );
 };

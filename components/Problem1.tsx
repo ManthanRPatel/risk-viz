@@ -1,9 +1,22 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, MarkerProps, Popup, Tooltip } from 'react-leaflet';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  MarkerProps,
+  Popup,
+  Tooltip,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { divIcon } from "leaflet";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
+import "tailwindcss/tailwind.css";
+
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 // import "leaflet/dist/images/marker-shadow.png";
 // import { icon } from "leaflet"
 // const Map = dynamic(() => import('../components/Map'), {
@@ -11,9 +24,13 @@ import dynamic from 'next/dynamic';
 // });
 
 const Problem1 = (props) => {
-
-  const { data, years, selectedDecade, setSelectedDecade } = props;
-
+  const {
+    data,
+    years,
+    selectedDecade,
+    setSelectedDecade,
+    setSelectedLocation,
+  } = props;
 
   // console.log("props", props);
   const position = [51.505, -0.09];
@@ -29,23 +46,23 @@ const Problem1 = (props) => {
 
   const [filteredData, setFilteredData] = useState<any[]>([]);
 
-  useEffect(()=>{
+  useEffect(() => {
     setMounted(true);
-    const getData = data.filter((asset: any) => asset.year == selectedDecade)
+    const getData = data.filter((asset: any) => asset.year == selectedDecade);
     setFilteredData(getData);
-  },[data, selectedDecade])
+  }, [data, selectedDecade]);
 
   console.log("filteredData ", filteredData);
 
   function getMarkerColor(riskRating: number) {
     if (riskRating >= 0.8) {
-      return 'red';
+      return "red";
     } else if (riskRating >= 0.6) {
-      return 'orange';
+      return "orange";
     } else if (riskRating >= 0.4) {
-      return 'yellow';
+      return "yellow";
     } else {
-      return 'green';
+      return "green";
     }
   }
 
@@ -53,52 +70,69 @@ const Problem1 = (props) => {
     return null;
   }
 
-  function handleMarkerClick(item:any) {
-    console.log(item);
+  function handleMarkerClick(item: any) {
+    setSelectedLocation([item.lat, item.long]);
   }
 
   if (typeof window !== "undefined") {
     return (
       <div>
-        <div className="container mx-auto p-4">
+        <div className=" items-center">
+          <div className="text-xl font-bold mb-4">Risk Visualization Map</div>
           <div className="mb-4">
-            <label htmlFor="decade-select" className="mr-2">
-              Select Decade:
-            </label>
-            <select
-              id="decade-select"
-              value={selectedDecade}
-              onChange={(e: any) => setSelectedDecade(e.target.value)}
-            >
-              {years.map((option:any) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            <FormControl sx={{ m: 1, minWidth: 80 }}>
+              <InputLabel id="demo-simple-select-autowidth-label">
+                Select Decade:
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-autowidth-label"
+                id="demo-simple-select-autowidth"
+                value={selectedDecade}
+                onChange={(e: any) => {
+                  setSelectedDecade(e.target.value);
+                  setSelectedLocation(null);
+                }}
+                autoWidth
+                label="Select Decade:"
+              >
+                {years.map((ele: string) => (
+                  <MenuItem key={ele} value={ele}>
+                    {ele}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </div>
-          <MapContainer center={[46.1351, -60.1831]} zoom={5}  style={{ height: "450px", width: "80vw" }}>
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        {filteredData && filteredData.length>0 && filteredData.map((item, idx) => (
-          <Marker
-          key={idx} 
-          position={[item.lat, item.long]}
-          color={getMarkerColor(item.riskRating)}
-          eventHandlers={{ click: () => handleMarkerClick(item) }}
-          // icon={icon({
-          //   iconUrl: "/marker.png",
-          //   iconSize: [32, 32],
-          // })}
+        </div>
+        <div className="container mx-auto">
+          <MapContainer
+            center={[46.1351, -60.1831]}
+            zoom={5}
+            style={{ height: "450px", width: "80vw" }}
           >
-            <Popup>
-              <div>{item.asset_name}</div>
-              <div>{item.business_category}</div>
-              <div>Risk Rating: {item.risk_rating}</div>
-            </Popup>
-            <Tooltip>{`${item.asset_name}, ${item.business_category}`}</Tooltip>
-          </Marker>
-        ))}
-      </MapContainer>
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            {filteredData &&
+              filteredData.length > 0 &&
+              filteredData.map((item, idx) => (
+                <Marker
+                  key={idx}
+                  position={[item.lat, item.long]}
+                  color={getMarkerColor(item.riskRating)}
+                  eventHandlers={{ click: () => handleMarkerClick(item) }}
+                  // icon={icon({
+                  //   iconUrl: "/marker.png",
+                  //   iconSize: [32, 32],
+                  // })}
+                >
+                  <Popup>
+                    <div>{item.asset_name}</div>
+                    <div>{item.business_category}</div>
+                    <div>Risk Rating: {item.risk_rating}</div>
+                  </Popup>
+                  <Tooltip>{`${item.asset_name}, ${item.business_category}`}</Tooltip>
+                </Marker>
+              ))}
+          </MapContainer>
         </div>
       </div>
     );

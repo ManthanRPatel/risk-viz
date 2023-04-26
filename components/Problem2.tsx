@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 // import "./css/table.css";
 import MyTable from "./Table";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import "tailwindcss/tailwind.css";
 
 
 const Problem2 = (props) => {
-  const { data, selectedDecade } = props;
+  const { data, selectedDecade, selectedLocation } = props;
 
   // console.log("data ", data);
   // console.log("sortedData ", sortedData)
@@ -14,36 +15,42 @@ const Problem2 = (props) => {
   const [sortColumn, setSortColumn] = useState<string>(""); // Column to sort by
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc"); // Sort order (ascending or descending)
 
-  const handleSort = (columnName: string) => {
-    if (sortColumn === columnName) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortColumn(columnName);
-      setSortOrder("asc");
-    }
-  };
+  // const handleSort = (columnName: string) => {
+  //   if (sortColumn === columnName) {
+  //     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+  //   } else {
+  //     setSortColumn(columnName);
+  //     setSortOrder("asc");
+  //   }
+  // };
 
   useEffect(() => {
     // Sort the data based on the current sort column and order
     if (data && data.length > 0) {
-      const getData = data.filter((asset: any) => asset.year == selectedDecade)
+      let getData = [];
 
-      const sortedData = getData.slice().sort((a, b) => {
-        const columnValueA = a[sortColumn] ?? "";
-        const columnValueB = b[sortColumn] ?? "";
-        if (sortOrder === "asc") {
-          return columnValueA.localeCompare(columnValueB, undefined, {
-            numeric: true,
-          });
-        } else {
-          return columnValueB.localeCompare(columnValueA, undefined, {
-            numeric: true,
-          });
-        }
-      });
-      setSortedData(sortedData);
+      if(selectedLocation && selectedLocation.length >0){
+        getData = data.filter((asset: any) => asset.lat == selectedLocation[0] && asset.long == selectedLocation[1] )
+      }
+      else{
+         getData = data.filter((asset: any) => asset.year == selectedDecade)
+      }
+      // const sortedData = getData.slice().sort((a, b) => {
+      //   const columnValueA = a[sortColumn] ?? "";
+      //   const columnValueB = b[sortColumn] ?? "";
+      //   if (sortOrder === "asc") {
+      //     return columnValueA.localeCompare(columnValueB, undefined, {
+      //       numeric: true,
+      //     });
+      //   } else {
+      //     return columnValueB.localeCompare(columnValueA, undefined, {
+      //       numeric: true,
+      //     });
+      //   }
+      // });
+      setSortedData(getData);
     }
-  }, [data, sortOrder, sortColumn]);
+  }, [data, sortOrder, sortColumn, selectedLocation, selectedDecade]);
 
   // const columnsName = [
   //   { label: "Asset", value: "asset_name" },
@@ -83,11 +90,11 @@ const Problem2 = (props) => {
   ];
 
   return (
-    <div>
-      <h1>Data Table</h1>
+    <div className=" mt-6 ">
+      <div className="text-xl font-bold mb-2">Data Table</div>
       <div style={{ height: 400, width: '100%' }}>
       <DataGrid
-        rows={data}
+        rows={sortedData}
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5]}

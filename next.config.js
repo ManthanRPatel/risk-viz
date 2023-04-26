@@ -4,6 +4,15 @@ const nextConfig = {
     appDir: true,
   },
   ignoreBuildErrors: true,
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/Home',
+        permanent: true,
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig
