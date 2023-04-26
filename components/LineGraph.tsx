@@ -7,7 +7,6 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import "tailwindcss/tailwind.css";
-import { AnyRecord } from "dns";
 
 //@ts-ignore
 Chart.defaults.scale.category = {
@@ -34,7 +33,10 @@ const Problem3 = (props:any) => {
     ],
   };
 
+  const [descriptionText, setDescriptionText] =  useState<string>("");
   const [chartData, setChartData] = useState<any>(initialStateChartData);
+  const [filteredData, setFilteredData] = useState<any[]>([]);
+  // const [chartOptions, setchartOptions] = useState(initialState);
   const [selectedAsset, setSelectedAsset] = useState<string>(""); // state for selected asset
   const [selectedBusinessCategory, setSelectedBusinessCategory] =
     useState<string>(""); // state for selected business category
@@ -44,17 +46,11 @@ const Problem3 = (props:any) => {
 
     if (data && data.length > 0) {
       if (event.target.value !== "") {
+        setDescriptionText("Selected Asset: "+ event.target.value);
         setSelectedBusinessCategory("");
-        let ChartdataSet = initialStateChartData;
-        data.forEach((ele: any) => {
-          if (ele.asset_name == event.target.value) {
-            //@ts-ignore
-            ChartdataSet.labels.push(parseInt(ele.year));
-            //@ts-ignore
-            ChartdataSet.datasets[0].data.push(parseFloat(ele["risk_rating"]));
-          }
-        });
-        setChartData(ChartdataSet);
+        const filteredData = data.filter((ele:any)=> ele.asset_name == event.target.value);
+        const chartDataSet = getChartData(filteredData);
+        setChartData(chartDataSet);
       }
     }
   };
@@ -67,111 +63,216 @@ const Problem3 = (props:any) => {
     if (data && data.length > 0) {
       if (event.target.value !== "") {
         setSelectedAsset("");
-        var ChartdataSet = initialStateChartData;
-        data.forEach((ele: any) => {
-          if (ele.business_category == event.target.value) {
-            //@ts-ignore
-            ChartdataSet.labels.push(parseInt(ele.year));
-           //@ts-ignore
-            ChartdataSet.datasets[0].data.push(parseFloat(ele["risk_rating"]));
-          }
-        });
-        setChartData(ChartdataSet);
+        setDescriptionText("Selected Business Category: "+ event.target.value);
+        const filteredData = data.filter((ele:any)=> ele.business_category == event.target.value);
+        const chartDataSet = getChartData(filteredData);
+        setChartData(chartDataSet);
       }
     }
   };
 
+  const getChartData = (filteredData: any) => {
+    setFilteredData(filteredData);
+    const chartData = {
+      labels: filteredData.map((item:any) => item.year),
+      datasets: [
+        {
+          label: "Risk Rating",
+          data: filteredData.map((item:any) => item.risk_rating),
+          backgroundColor: filteredData.map((item:any) => {
+            if (item.risk_rating >= 0.8) {
+              return "rgba(255, 99, 132, 0.2)";
+            } else if (item.risk_rating >= 0.6) {
+              return "rgba(255, 159, 64, 0.2)";
+            } else if (item.risk_rating >= 0.4) {
+              return "rgba(255, 205, 86, 0.2)";
+            } else {
+              return "rgba(75, 192, 192, 0.2)";
+            }
+          }),
+          borderColor: filteredData.map((item:any) => {
+            if (item.risk_rating >= 0.8) {
+              return "rgba(255, 99, 132, 1)";
+            } else if (item.risk_rating >= 0.6) {
+              return "rgba(255, 159, 64, 1)";
+            } else if (item.risk_rating >= 0.4) {
+              return "rgba(255, 205, 86, 1)";
+            } else {
+              return "rgba(75, 192, 192, 1)";
+            }
+          }),
+          borderWidth: 1,
+          hoverBackgroundColor: filteredData.map((item:any) => {
+            if (item.risk_rating >= 0.8) {
+              return "rgba(255, 99, 132, 0.4)";
+            } else if (item.risk_rating >= 0.6) {
+              return "rgba(255, 159, 64, 0.4)";
+            } else if (item.risk_rating >= 0.4) {
+              return "rgba(255, 205, 86, 0.4)";
+            } else {
+              return "rgba(75, 192, 192, 0.4)";
+            }
+          }),
+          hoverBorderColor: filteredData.map((item:any) => {
+            if (item.risk_rating >= 0.8) {
+              return "rgba(255, 99, 132, 1)";
+            } else if (item.risk_rating >= 0.6) {
+              return "rgba(255, 159, 64, 1)";
+            } else if (item.risk_rating >= 0.4) {
+              return "rgba(255, 205, 86, 1)";
+            } else {
+              return "rgba(75, 192, 192, 1)";
+            }
+          }),
+        },
+      ],
+    };
+    return chartData;
+  }
+
   useEffect(() => {
-    var ChartdataSet = initialStateChartData;
     if (data && data.length > 0) {
       if (selectedLocation) {
-        data.forEach((ele: any) => {
-          if (
-            Number(ele.lat) == selectedLocation[0] &&
-            Number(ele.long) == selectedLocation[1]
-          ) {
-            //@ts-ignore
-            ChartdataSet.labels.push(parseInt(ele.year));
-            //@ts-ignore
-            ChartdataSet.datasets[0].data.push(parseFloat(ele["risk_rating"]));
-          }
-        });
-        setChartData(ChartdataSet);
+        setDescriptionText("Selected Location: Lat("+ selectedLocation[0] +"), Long(" + selectedLocation[1] +")");
+        setSelectedAsset("");
+        setSelectedBusinessCategory("");
+        const filteredData = data.filter((ele:any)=> Number(ele.lat) == selectedLocation[0] && Number(ele.long) == selectedLocation[1]);
+        const chartDataSet = getChartData(filteredData);
+        setChartData(chartDataSet);
       }
     }
   }, [selectedLocation]);
 
-  const options = {
-    scales: {
-      x: {
-        type: "linear",
-        position: "bottom",
-        title: {
-          display: true,
-          text: "Year",
-        },
-      },
-      y: {
-        type: "linear",
-        position: "left",
-        title: {
-          display: true,
-          text: "Risk Rating",
-        },
-      },
-    },
-    plugins: {
-      tooltip: {
-        callbacks: {
-          // title: function(tooltipItems: { datasetIndex: string | number; }[], data: { datasets: { [x: string]: { label: any; }; }; }) {
-          //   console.log("data ", data);
-          //   console.log("data.datasets ", data.datasets);
-          //   if()
+  // const options = {
+  //   scales: {
+  //     x: {
+  //       type: "linear",
+  //       position: "bottom",
+  //       title: {
+  //         display: true,
+  //         text: "Year",
+  //       },
+  //     },
+  //     y: {
+  //       type: "linear",
+  //       position: "left",
+  //       title: {
+  //         display: true,
+  //         text: "Risk Rating",
+  //       },
+  //     },
+  //   },
+  //   plugins: {
+  //     tooltip: {
+  //       callbacks: {
+  //         // title: function(tooltipItems: { datasetIndex: string | number; }[], data: { datasets: { [x: string]: { label: any; }; }; }) {
+  //         //   console.log("data ", data);
+  //         //   console.log("data.datasets ", data.datasets);
+  //         //   if()
 
-          //   return `Asset Name: ${data.datasets[tooltipItems[0].datasetIndex].label}`;
-          // },
-          label: function (
-            tooltipItem: {
-              datasetIndex: string | number;
-              index: string | number;
-            },
-            data: { datasets: { [x: string]: any } }
-          ) {
-            if (data?.datasets) {
-              // console.log("data?.datasets ", data?.datasets);
-              const dataset = data.datasets[tooltipItem.datasetIndex];
-              const year = dataset.data[tooltipItem.index].x;
-              const riskRating = dataset.data[tooltipItem.index].y;
-              const riskFactors = dataset.riskFactors[year] || {};
-              const riskFactorsStr = Object.entries(riskFactors)
-                .map(([key, value]) => `${key}: ${value}`)
-                .join(", ");
-              return `Year: ${year}, Risk Rating: ${riskRating}, Risk Factors: ${riskFactorsStr}`;
-            } else {
-              return "";
-            }
-          },
+  //         //   return `Asset Name: ${data.datasets[tooltipItems[0].datasetIndex].label}`;
+  //         // },
+  //         label: function (
+  //           tooltipItem: {
+  //             datasetIndex: string | number;
+  //             index: string | number;
+  //           },
+  //           data: { datasets: { [x: string]: any } }
+  //         ) {
+  //           if (data?.datasets) {
+  //             // console.log("data?.datasets ", data?.datasets);
+  //             const dataset = data.datasets[tooltipItem.datasetIndex];
+  //             const year = dataset.data[tooltipItem.index].x;
+  //             const risk_rating = dataset.data[tooltipItem.index].y;
+  //             const riskFactors = dataset.riskFactors[year] || {};
+  //             const riskFactorsStr = Object.entries(riskFactors)
+  //               .map(([key, value]) => `${key}: ${value}`)
+  //               .join(", ");
+  //             return `Year: ${year}, Risk Rating: ${risk_rating}, Risk Factors: ${riskFactorsStr}`;
+  //           } else {
+  //             return "";
+  //           }
+  //         },
+  //       },
+  //     },
+  //   },
+  // };
+
+  // const options = {
+  //   tooltips: {
+  //     callbacks: {
+  //       label: function (tooltipItem:any, data:any) {
+  //         const assetName = 'Asset Name: ' + 'Asset ' + tooltipItem.index;
+  //         const risk_rating = 'Risk Rating: ' + data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+  //         const riskFactors = 'Risk Factors: ' + 'Factor A, Factor B, Factor C';
+  //         const year = 'Year: ' + data.labels[tooltipItem.index];
+  //         return [assetName, risk_rating, riskFactors, year];
+  //       },
+  //     },
+  //   },
+  // };
+
+  const options = {
+    plugins:{
+      tooltip: {
+      callbacks: {
+        title: (tooltipItem:any) =>{
+          const item = filteredData[tooltipItem[0].dataIndex];
+          return [`Asset Name: ${item.asset_name}`];
+        },
+        label: (tooltipItem:any) => {
+          const item = filteredData[tooltipItem.dataIndex];
+          let riskFactors = JSON.parse(item.risk_factors);
+          const riskFactorKeys = Object.keys(riskFactors);
+          const riskFactorValues = Object.values(riskFactors);
+
+          var str = [];
+          for(let i = 0; i < riskFactorKeys.length; i++){
+            str.push(riskFactorKeys[i]+':'+riskFactorValues[i])
+          }
+          riskFactors = str.join(', ');
+          return [
+            `Year: ${item.year}`,
+            `Risk Rating: ${item.risk_rating}`,
+            `Risk Factors: ${riskFactors}`,
+          ];
         },
       },
     },
+    }
   };
 
-  // console.log("chartData", chartData);
+  // const options = {
+  //   scales: {
+  //     yAxes: [
+  //       {
+  //         ticks: {
+  //           beginAtZero: true,
+  //         },
+  //       },
+  //     ],
+  //   },
+  //   tooltips: {
+  //     callbacks: {
+  //       label: function (tooltipItem:any, data:any) {
+  //         const datasetLabel = data.datasets[tooltipItem.datasetIndex].label || '';
+  //         const value = tooltipItem.yLabel;
+  //         const year = data.datasets[tooltipItem.datasetIndex].year[tooltipItem.index];
+  //         const riskFactors = Object.entries(data.datasets[tooltipItem.datasetIndex].riskFactors[tooltipItem.index]).map(
+  //           ([key, value]) => `${key}: ${value}`
+  //         );
+  //         const tooltipContent = [`${datasetLabel}: ${value}`, `Year: ${year}`, ...riskFactors].join('\n');
+  //         return tooltipContent;
+  //       },
+  //     },
+  //   },
+  // };
 
   return (
     <div className="mt-6">
       <div className="text-xl font-bold">Line Graph</div>
       <div className="text-lg my-2">
-        {selectedAsset
-          ? "Selected Asset: " + selectedAsset
-          : selectedBusinessCategory
-          ? "Selected Business Category: " + selectedBusinessCategory
-          : selectedLocation && selectedLocation.length > 0
-          ? "Selected Location: " +
-            selectedLocation[0] +
-            "," +
-            selectedLocation[1]
-          : null}
+          {descriptionText}
       </div>
 
       <FormControl sx={{ m: 1, minWidth: 80 }}>
@@ -218,7 +319,6 @@ const Problem3 = (props:any) => {
         </Select>
       </FormControl>
 
-      {/* Implement a form or dropdown menu to select the item */}
       {(selectedAsset || selectedBusinessCategory || selectedLocation) &&
         chartData &&
         data.length > 0 && (

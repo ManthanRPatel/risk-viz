@@ -7,12 +7,13 @@ import {
   MarkerProps,
   Popup,
   Tooltip,
+  useMap
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { divIcon } from "leaflet";
 import dynamic from "next/dynamic";
 import "tailwindcss/tailwind.css";
-import * as L from "leaflet";
+import L from "leaflet";
 
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -42,17 +43,7 @@ const Problem1 = (props:any) => {
   } = props;
 
   // console.log("props", props);
-  const position = [51.505, -0.09];
-  // const decadeOptions = [
-  //   { label: 2050, value: 2050 },
-  //   { label: 2060, value: 2060 },
-  //   { label: 2070, value: 2070 },
-  //   { label: 2080, value: 2080 },
-  // ];
-  // const [selectedDecade, setSelectedDecade] = useState(decadeOptions[0].value);
-
   const [mounted, setMounted] = useState(false);
-
   const [filteredData, setFilteredData] = useState<any[]>([]);
 
   useEffect(() => {
@@ -63,20 +54,42 @@ const Problem1 = (props:any) => {
 
   // console.log("filteredData ", filteredData);
 
-  function getMarkerColor(riskRating: number) {
+  const redIcon = L.icon({
+    iconUrl: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+  });
+
+  const orangeIcon = L.icon({
+    iconUrl: "https://maps.google.com/mapfiles/ms/icons/orange-dot.png",
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+  });
+
+  const yellowIcon = L.icon({
+    iconUrl: "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png",
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+  });
+
+  const greenIcon = L.icon({
+    iconUrl: "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+  });
+
+  function getMarkerIcon(riskRating: number) {
     if (riskRating >= 0.8) {
-      return "red";
+      return redIcon;
     } else if (riskRating >= 0.6) {
-      return "orange";
+      return orangeIcon;
     } else if (riskRating >= 0.4) {
-      return "yellow";
+      return yellowIcon;
     } else {
-      return "green";
+      return greenIcon;
     }
   }
-  const getMarkerIcon =( )=>{
 
-  }
 
   if (!mounted) {
     return null;
@@ -131,6 +144,7 @@ const Problem1 = (props:any) => {
                   position={[item.lat, item.long]}
                   // color={getMarkerColor(item.riskRating)}
                   eventHandlers={{ click: () => handleMarkerClick(item) }}
+                  icon={getMarkerIcon(item.risk_rating)}
                   // icon={icon({
                   //   iconUrl: "/marker.png",
                   //   iconSize: [32, 32],
