@@ -3,15 +3,15 @@ import React, { useState, useEffect } from "react";
 import Paper from "@mui/material/Paper";
 import "tailwindcss/tailwind.css";
 
-const Map = dynamic(() => import("../components/Problem1"), {
+const Map = dynamic(() => import("../components/Map"), {
   ssr: false,
 });
 
-const Table = dynamic(() => import("../components/Problem2"), {
+const Table = dynamic(() => import("../components/DataTable"), {
   ssr: false,
 });
 
-const LineChart = dynamic(() => import("../components/Problem3"), {
+const LineChart = dynamic(() => import("../components/LineGraph"), {
   ssr: false,
 });
 

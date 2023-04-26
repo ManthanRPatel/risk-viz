@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-// import "./css/table.css";
-import MyTable from "./Table";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import "tailwindcss/tailwind.css";
 
@@ -8,8 +6,6 @@ import "tailwindcss/tailwind.css";
 const Problem2 = (props) => {
   const { data, selectedDecade, selectedLocation } = props;
 
-  // console.log("data ", data);
-  // console.log("sortedData ", sortedData)
   const [sortedData, setSortedData] = useState<any[]>([]);
 
   const [sortColumn, setSortColumn] = useState<string>(""); // Column to sort by

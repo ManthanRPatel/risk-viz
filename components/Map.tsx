@@ -12,6 +12,7 @@ import "leaflet/dist/leaflet.css";
 import { divIcon } from "leaflet";
 import dynamic from "next/dynamic";
 import "tailwindcss/tailwind.css";
+import * as L from "leaflet";
 
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -64,6 +65,9 @@ const Problem1 = (props) => {
     } else {
       return "green";
     }
+  }
+  const getMarkerIcon =( )=>{
+
   }
 
   if (!mounted) {
