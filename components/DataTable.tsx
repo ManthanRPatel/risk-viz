@@ -38,7 +38,8 @@ const Problem2 = (props: any) => {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [filter, setFilter] = useState({ filterCol: "", filterVal: "" });
+  const initialStateFilter = { filterCol: "", filterVal: "" };
+  const [filter, setFilter] = useState(initialStateFilter);
   const [isUpdatedFilterSort, setIsUpdatedFilterSort] = useState(false);
 
   const handleSort = (columnName: string) => {
@@ -100,7 +101,10 @@ const Problem2 = (props: any) => {
   };
 
   useEffect(() => {
-    getData();
+    setPage(0);
+    setFilter(initialStateFilter);
+    setSortColumn("");
+    setIsUpdatedFilterSort(true);
   }, [data, selectedLocation, selectedDecade]);
 
   useEffect(() => {
@@ -197,7 +201,7 @@ const Problem2 = (props: any) => {
     //   })
     // }
     // setSortedData(filteredArr);
-    if (filter && filter.filterCol && filter.filterVal.trim() !== "") {
+    if (filter && filter.filterCol) {
       setPage(0);
       setIsUpdatedFilterSort(true);
     }
