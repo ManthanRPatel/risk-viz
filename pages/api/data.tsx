@@ -2,6 +2,19 @@ import csv from "csv-parser";
 import fs from "fs";
 import path from "path";
 
+function convertJSONString(jsonString:any) {
+  const parsedJson = JSON.parse(jsonString);
+  const keys = Object.keys(parsedJson);
+  let result = '';
+  for (let i = 0; i < keys.length; i++) {
+    result += `${keys[i]}: ${parsedJson[keys[i]]}`;
+    if (i !== keys.length - 1) {
+      result += ', ';
+    }
+  }
+  return result;
+}
+
 export default async function handler(req: any, res: any) {
   const filePath = path.join(process.cwd(), "./public/sample_data.csv");
   const data: any[] = [];
@@ -19,7 +32,12 @@ export default async function handler(req: any, res: any) {
       }
       const newRow: any = { id: id };
       for (const [key, value] of Object.entries(row)) {
-        newRow[key.toLowerCase().replace(/ /g, "_")] = value;
+        if(key.toLowerCase().replace(/ /g, "_") === "risk_factors"){
+          newRow["risk_factors"] = convertJSONString(value);
+        }
+        else{
+          newRow[key.toLowerCase().replace(/ /g, "_")] = value;
+        }
       }
       data.push(newRow);
       id++;

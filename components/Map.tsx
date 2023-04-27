@@ -10,28 +10,35 @@ import {
   useMap
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { divIcon } from "leaflet";
-import dynamic from "next/dynamic";
 import "tailwindcss/tailwind.css";
 import L from "leaflet";
-
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-// import "leaflet/dist/images/marker-shadow.png";
-// import { icon } from "leaflet"
-// const Map = dynamic(() => import('../components/Map'), {
-//   ssr: false
-// });
 
-interface MapProps {
-  data: [];
-  years: [];
-  selectedDecade?: number;
-  setSelectedDecade: (value: string) => void;
-  setSelectedLocation: (value: []) => void;
-}
+
+type RiskFactor = {
+  [key: string]: number;
+};
+
+type Asset = {
+  assetName: string;
+  lat: number;
+  long: number;
+  businessCategory: string;
+  riskRating: number;
+  riskFactors: RiskFactor;
+  year: number;
+};
+
+type Problem1Props = {
+  data: Asset[];
+  years: number[];
+  selectedDecade: number;
+  setSelectedDecade: (decade: number) => void;
+  setSelectedLocation: (asset: Asset) => void;
+};
 
 const Problem1 = (props:any) => {
   const {
@@ -52,42 +59,23 @@ const Problem1 = (props:any) => {
     setFilteredData(getData);
   }, [data, selectedDecade]);
 
-  // console.log("filteredData ", filteredData);
-
-  const redIcon = L.icon({
-    iconUrl: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-  });
-
-  const orangeIcon = L.icon({
-    iconUrl: "https://maps.google.com/mapfiles/ms/icons/orange-dot.png",
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-  });
-
-  const yellowIcon = L.icon({
-    iconUrl: "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png",
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-  });
-
-  const greenIcon = L.icon({
-    iconUrl: "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-  });
 
   function getMarkerIcon(riskRating: number) {
+    let iconUrl = "";
     if (riskRating >= 0.8) {
-      return redIcon;
+      iconUrl = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
     } else if (riskRating >= 0.6) {
-      return orangeIcon;
+      iconUrl = "https://maps.google.com/mapfiles/ms/icons/orange-dot.png";
     } else if (riskRating >= 0.4) {
-      return yellowIcon;
+      iconUrl = "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
     } else {
-      return greenIcon;
+      iconUrl = "https://maps.google.com/mapfiles/ms/icons/green-dot.png";
     }
+    return L.icon({
+      iconUrl,
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+    });
   }
 
 
@@ -151,9 +139,9 @@ const Problem1 = (props:any) => {
                   // })}
                 >
                   <Popup>
-                    <div>{item.asset_name}</div>
-                    <div>{item.business_category}</div>
-                    <div>Risk Rating: {item.risk_rating}</div>
+                    <div><b>Asset Name:</b> {item.asset_name}</div>
+                    <div><b>Business Category:</b> {item.business_category}</div>
+                    <div><b>Risk Rating:</b> {item.risk_rating}</div>
                   </Popup>
                   <Tooltip>{`${item.asset_name}, ${item.business_category}`}</Tooltip>
                 </Marker>

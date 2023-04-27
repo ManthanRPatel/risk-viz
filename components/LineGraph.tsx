@@ -17,6 +17,22 @@ Chart.defaults.scale.category = {
   },
 };
 
+type Problem3Props = {
+  data: {
+    assetName: string;
+    lat: number;
+    long: number;
+    businessCategory: string;
+    riskRating: number;
+    riskFactors: { [key: string]: number };
+    year: number;
+  }[];
+  years: number[];
+  businessCategories: string[];
+  assets: string[];
+  selectedLocation: { lat: number; lng: number } | null;
+};
+
 const Problem3 = (props:any) => {
   const { data, years, businessCategories, assets, selectedLocation } = props;
 
@@ -36,7 +52,6 @@ const Problem3 = (props:any) => {
   const [descriptionText, setDescriptionText] =  useState<string>("");
   const [chartData, setChartData] = useState<any>(initialStateChartData);
   const [filteredData, setFilteredData] = useState<any[]>([]);
-  // const [chartOptions, setchartOptions] = useState(initialState);
   const [selectedAsset, setSelectedAsset] = useState<string>(""); // state for selected asset
   const [selectedBusinessCategory, setSelectedBusinessCategory] =
     useState<string>(""); // state for selected business category
@@ -143,75 +158,6 @@ const Problem3 = (props:any) => {
     }
   }, [selectedLocation]);
 
-  // const options = {
-  //   scales: {
-  //     x: {
-  //       type: "linear",
-  //       position: "bottom",
-  //       title: {
-  //         display: true,
-  //         text: "Year",
-  //       },
-  //     },
-  //     y: {
-  //       type: "linear",
-  //       position: "left",
-  //       title: {
-  //         display: true,
-  //         text: "Risk Rating",
-  //       },
-  //     },
-  //   },
-  //   plugins: {
-  //     tooltip: {
-  //       callbacks: {
-  //         // title: function(tooltipItems: { datasetIndex: string | number; }[], data: { datasets: { [x: string]: { label: any; }; }; }) {
-  //         //   console.log("data ", data);
-  //         //   console.log("data.datasets ", data.datasets);
-  //         //   if()
-
-  //         //   return `Asset Name: ${data.datasets[tooltipItems[0].datasetIndex].label}`;
-  //         // },
-  //         label: function (
-  //           tooltipItem: {
-  //             datasetIndex: string | number;
-  //             index: string | number;
-  //           },
-  //           data: { datasets: { [x: string]: any } }
-  //         ) {
-  //           if (data?.datasets) {
-  //             // console.log("data?.datasets ", data?.datasets);
-  //             const dataset = data.datasets[tooltipItem.datasetIndex];
-  //             const year = dataset.data[tooltipItem.index].x;
-  //             const risk_rating = dataset.data[tooltipItem.index].y;
-  //             const riskFactors = dataset.riskFactors[year] || {};
-  //             const riskFactorsStr = Object.entries(riskFactors)
-  //               .map(([key, value]) => `${key}: ${value}`)
-  //               .join(", ");
-  //             return `Year: ${year}, Risk Rating: ${risk_rating}, Risk Factors: ${riskFactorsStr}`;
-  //           } else {
-  //             return "";
-  //           }
-  //         },
-  //       },
-  //     },
-  //   },
-  // };
-
-  // const options = {
-  //   tooltips: {
-  //     callbacks: {
-  //       label: function (tooltipItem:any, data:any) {
-  //         const assetName = 'Asset Name: ' + 'Asset ' + tooltipItem.index;
-  //         const risk_rating = 'Risk Rating: ' + data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-  //         const riskFactors = 'Risk Factors: ' + 'Factor A, Factor B, Factor C';
-  //         const year = 'Year: ' + data.labels[tooltipItem.index];
-  //         return [assetName, risk_rating, riskFactors, year];
-  //       },
-  //     },
-  //   },
-  // };
-
   const options = {
     plugins:{
       tooltip: {
@@ -222,51 +168,24 @@ const Problem3 = (props:any) => {
         },
         label: (tooltipItem:any) => {
           const item = filteredData[tooltipItem.dataIndex];
-          let riskFactors = JSON.parse(item.risk_factors);
-          const riskFactorKeys = Object.keys(riskFactors);
-          const riskFactorValues = Object.values(riskFactors);
-
-          var str = [];
-          for(let i = 0; i < riskFactorKeys.length; i++){
-            str.push(riskFactorKeys[i]+':'+riskFactorValues[i])
-          }
-          riskFactors = str.join(', ');
+          // let riskFactors = JSON.parse(item.risk_factors);
+          // const riskFactorKeys = Object.keys(riskFactors);
+          // const riskFactorValues = Object.values(riskFactors);
+          // var str = [];
+          // for(let i = 0; i < riskFactorKeys.length; i++){
+          //   str.push(riskFactorKeys[i]+':'+riskFactorValues[i])
+          // }
+          // riskFactors = str.join(', ');
           return [
             `Year: ${item.year}`,
             `Risk Rating: ${item.risk_rating}`,
-            `Risk Factors: ${riskFactors}`,
+            `Risk Factors: ${item.risk_factors}`,
           ];
         },
       },
     },
     }
   };
-
-  // const options = {
-  //   scales: {
-  //     yAxes: [
-  //       {
-  //         ticks: {
-  //           beginAtZero: true,
-  //         },
-  //       },
-  //     ],
-  //   },
-  //   tooltips: {
-  //     callbacks: {
-  //       label: function (tooltipItem:any, data:any) {
-  //         const datasetLabel = data.datasets[tooltipItem.datasetIndex].label || '';
-  //         const value = tooltipItem.yLabel;
-  //         const year = data.datasets[tooltipItem.datasetIndex].year[tooltipItem.index];
-  //         const riskFactors = Object.entries(data.datasets[tooltipItem.datasetIndex].riskFactors[tooltipItem.index]).map(
-  //           ([key, value]) => `${key}: ${value}`
-  //         );
-  //         const tooltipContent = [`${datasetLabel}: ${value}`, `Year: ${year}`, ...riskFactors].join('\n');
-  //         return tooltipContent;
-  //       },
-  //     },
-  //   },
-  // };
 
   return (
     <div className="mt-6">
