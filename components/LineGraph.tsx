@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { NextPage } from "next";
 import { Line } from "react-chartjs-2";
 import Chart from "chart.js/auto";
+import type { ChartData, ChartOptions } from 'chart.js';
 
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import "tailwindcss/tailwind.css";
+import { DataRow } from "@/app/types/types";
 
 //@ts-ignore
 Chart.defaults.scale.category = {
@@ -17,24 +20,15 @@ Chart.defaults.scale.category = {
   },
 };
 
-type Problem3Props = {
-  data: {
-    assetName: string;
-    lat: number;
-    long: number;
-    businessCategory: string;
-    riskRating: number;
-    riskFactors: { [key: string]: number };
-    year: number;
-  }[];
-  years: number[];
+interface LineChartProps {
+  years: string[];
+  data: DataRow[];
   businessCategories: string[];
   assets: string[];
-  selectedLocation: { lat: number; lng: number } | null;
-};
+  selectedLocation: [number, number] | null;
+}
 
-const Problem3 = (props:any) => {
-  const { data, years, businessCategories, assets, selectedLocation } = props;
+const LineChart: NextPage<LineChartProps> = ({ data, years, businessCategories, assets, selectedLocation }: LineChartProps) => {
 
   const initialStateChartData = {
     labels: [],
@@ -50,29 +44,27 @@ const Problem3 = (props:any) => {
   };
 
   const [descriptionText, setDescriptionText] =  useState<string>("");
-  const [chartData, setChartData] = useState<any>(initialStateChartData);
-  const [filteredData, setFilteredData] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<ChartData<'line'>>(initialStateChartData);
+  const [filteredData, setFilteredData] = useState<DataRow[]>([]);
   const [selectedAsset, setSelectedAsset] = useState<string>(""); // state for selected asset
   const [selectedBusinessCategory, setSelectedBusinessCategory] =
     useState<string>(""); // state for selected business category
 
-  const handleAssetChange = (event: any) => {
+  const handleAssetChange = (event: SelectChangeEvent) => {
     setSelectedAsset(event.target.value);
 
     if (data && data.length > 0) {
       if (event.target.value !== "") {
         setDescriptionText("Selected Asset: "+ event.target.value);
         setSelectedBusinessCategory("");
-        const filteredData = data.filter((ele:any)=> ele.asset_name == event.target.value);
+        const filteredData = data.filter((ele:DataRow)=> ele.asset_name == event.target.value);
         const chartDataSet = getChartData(filteredData);
         setChartData(chartDataSet);
       }
     }
   };
 
-  const handleBusinessCategoryChange = (
-    event: any
-  ) => {
+  const handleBusinessCategoryChange = ( event: SelectChangeEvent ) => {
     setSelectedBusinessCategory(event.target.value);
 
     if (data && data.length > 0) {
@@ -86,54 +78,55 @@ const Problem3 = (props:any) => {
     }
   };
 
-  const getChartData = (filteredData: any) => {
+  const getChartData = (filteredData: DataRow[]): ChartData<'line'> => {
     setFilteredData(filteredData);
-    const chartData = {
-      labels: filteredData.map((item:any) => item.year),
+    let chartData: ChartData<'line'> = initialStateChartData;
+    chartData = {
+      labels: filteredData.map((item:DataRow) => item.year),
       datasets: [
         {
           label: "Risk Rating",
-          data: filteredData.map((item:any) => item.risk_rating),
-          backgroundColor: filteredData.map((item:any) => {
-            if (item.risk_rating >= 0.8) {
+          data: filteredData.map((item:DataRow) => Number(item.risk_rating)),
+          backgroundColor: filteredData.map((item:DataRow) => {
+            if (Number(item.risk_rating) >= 0.8) {
               return "rgba(255, 99, 132, 0.2)";
-            } else if (item.risk_rating >= 0.6) {
+            } else if (Number(item.risk_rating) >= 0.6) {
               return "rgba(255, 159, 64, 0.2)";
-            } else if (item.risk_rating >= 0.4) {
+            } else if (Number(item.risk_rating) >= 0.4) {
               return "rgba(255, 205, 86, 0.2)";
             } else {
               return "rgba(75, 192, 192, 0.2)";
             }
           }),
-          borderColor: filteredData.map((item:any) => {
-            if (item.risk_rating >= 0.8) {
+          borderColor: filteredData.map((item:DataRow) => {
+            if (Number(item.risk_rating) >= 0.8) {
               return "rgba(255, 99, 132, 1)";
-            } else if (item.risk_rating >= 0.6) {
+            } else if (Number(item.risk_rating) >= 0.6) {
               return "rgba(255, 159, 64, 1)";
-            } else if (item.risk_rating >= 0.4) {
+            } else if (Number(item.risk_rating) >= 0.4) {
               return "rgba(255, 205, 86, 1)";
             } else {
               return "rgba(75, 192, 192, 1)";
             }
           }),
           borderWidth: 1,
-          hoverBackgroundColor: filteredData.map((item:any) => {
-            if (item.risk_rating >= 0.8) {
+          hoverBackgroundColor: filteredData.map((item:DataRow) => {
+            if (Number(item.risk_rating) >= 0.8) {
               return "rgba(255, 99, 132, 0.4)";
-            } else if (item.risk_rating >= 0.6) {
+            } else if (Number(item.risk_rating) >= 0.6) {
               return "rgba(255, 159, 64, 0.4)";
-            } else if (item.risk_rating >= 0.4) {
+            } else if (Number(item.risk_rating) >= 0.4) {
               return "rgba(255, 205, 86, 0.4)";
             } else {
               return "rgba(75, 192, 192, 0.4)";
             }
           }),
-          hoverBorderColor: filteredData.map((item:any) => {
-            if (item.risk_rating >= 0.8) {
+          hoverBorderColor: filteredData.map((item:DataRow) => {
+            if (Number(item.risk_rating) >= 0.8) {
               return "rgba(255, 99, 132, 1)";
-            } else if (item.risk_rating >= 0.6) {
+            } else if (Number(item.risk_rating) >= 0.6) {
               return "rgba(255, 159, 64, 1)";
-            } else if (item.risk_rating >= 0.4) {
+            } else if (Number(item.risk_rating) >= 0.4) {
               return "rgba(255, 205, 86, 1)";
             } else {
               return "rgba(75, 192, 192, 1)";
@@ -151,14 +144,14 @@ const Problem3 = (props:any) => {
         setDescriptionText("Selected Location: Lat("+ selectedLocation[0] +"), Long(" + selectedLocation[1] +")");
         setSelectedAsset("");
         setSelectedBusinessCategory("");
-        const filteredData = data.filter((ele:any)=> Number(ele.lat) == selectedLocation[0] && Number(ele.long) == selectedLocation[1]);
+        const filteredData = data.filter((ele:DataRow)=> Number(ele.lat) == selectedLocation[0] && Number(ele.long) == selectedLocation[1]);
         const chartDataSet = getChartData(filteredData);
         setChartData(chartDataSet);
       }
     }
   }, [selectedLocation]);
 
-  const options = {
+  const options : ChartOptions<'line'> = {
     plugins:{
       tooltip: {
       callbacks: {
@@ -168,14 +161,6 @@ const Problem3 = (props:any) => {
         },
         label: (tooltipItem:any) => {
           const item = filteredData[tooltipItem.dataIndex];
-          // let riskFactors = JSON.parse(item.risk_factors);
-          // const riskFactorKeys = Object.keys(riskFactors);
-          // const riskFactorValues = Object.values(riskFactors);
-          // var str = [];
-          // for(let i = 0; i < riskFactorKeys.length; i++){
-          //   str.push(riskFactorKeys[i]+':'+riskFactorValues[i])
-          // }
-          // riskFactors = str.join(', ');
           return [
             `Year: ${item.year}`,
             `Risk Rating: ${item.risk_rating}`,
@@ -243,7 +228,6 @@ const Problem3 = (props:any) => {
         data.length > 0 && (
           <>
             <Line 
-              //@ts-ignore
               options={options} 
               data={chartData} 
             />
@@ -253,4 +237,4 @@ const Problem3 = (props:any) => {
   );
 };
 
-export default Problem3;
+export default LineChart;

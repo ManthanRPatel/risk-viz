@@ -12,35 +12,35 @@ import {
   TablePagination,
 } from "@mui/material";
 import TextField from "@mui/material/TextField";
+import { DataRow } from "@/app/types/types";
+import { NextPage } from "next";
 
-type Problem2Props = {
-  data: {
-    assetName: string;
-    lat: number;
-    long: number;
-    businessCategory: string;
-    riskRating: number;
-    riskFactors: { [key: string]: number };
-    year: number;
-  }[];
-  selectedDecade: number;
-  selectedLocation: { lat: number; lng: number } | null;
-};
+interface TableProps {
+  data: DataRow[];
+  years: string[];
+  selectedDecade: number | null;
+  setSelectedDecade: React.Dispatch<React.SetStateAction<number | null>>;
+  selectedLocation: [number, number] | null;
+}
 
-const Problem2 = (props: any) => {
-  const { data, selectedDecade, selectedLocation } = props;
+interface FilterState {
+  filterCol: string;
+  filterVal: string;
+}
 
-  const [sortedData, setSortedData] = useState<any[]>([]);
+const DataTable: NextPage<TableProps> = ({  data, selectedDecade, selectedLocation }: TableProps) => {
+  
+  const [sortedData, setSortedData] = useState<DataRow[]>([]);
 
   const [sortColumn, setSortColumn] = useState<string>(""); // Column to sort by
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc"); // Sort order (ascending or descending)
   const [descriptionText, setDescriptionText] = useState<string>("");
 
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const initialStateFilter = { filterCol: "", filterVal: "" };
-  const [filter, setFilter] = useState(initialStateFilter);
-  const [isUpdatedFilterSort, setIsUpdatedFilterSort] = useState(false);
+  const [filter, setFilter] = useState<FilterState>(initialStateFilter);
+  const [isUpdatedFilterSort, setIsUpdatedFilterSort] = useState<boolean>(false);
 
   const handleSort = (columnName: string) => {
     if (sortColumn === columnName) {
@@ -63,17 +63,17 @@ const Problem2 = (props: any) => {
           ")"
       );
       getDataArr = data.filter(
-        (asset: any) =>
-          asset.lat == selectedLocation[0] && asset.long == selectedLocation[1]
+        (asset: DataRow) =>
+          Number(asset.lat) == selectedLocation[0] && Number(asset.long) == selectedLocation[1]
       );
     } else {
       setDescriptionText("Selected Decade: " + selectedDecade);
-      getDataArr = data.filter((asset: any) => asset.year == selectedDecade);
+      getDataArr = data.filter((asset: DataRow) => Number(asset.year) == selectedDecade);
     }
 
     let filteredArr = getDataArr;
     if (filter && filter.filterCol && filter.filterVal.trim() !== "") {
-      filteredArr = filteredArr.filter((ele: any) => {
+      filteredArr = filteredArr.filter((ele : any) => {
         return ele[filter.filterCol]
           .toLowerCase()
           .includes(filter.filterVal.toLowerCase());
@@ -113,35 +113,6 @@ const Problem2 = (props: any) => {
     }
   }, [isUpdatedFilterSort]);
 
-  // useEffect(() => {
-  //   if (data && data.length > 0) {
-  //     let getData = [];
-  //     if(selectedLocation && selectedLocation.length >0){
-  //       setDescriptionText("Selected Location: Lat("+ selectedLocation[0] +"), Long(" + selectedLocation[1] +")");
-  //       getData = data.filter((asset: any) => asset.lat == selectedLocation[0] && asset.long == selectedLocation[1] )
-  //     }
-  //     else{
-  //       setDescriptionText("Selected Decade: "+ selectedDecade);
-  //        getData = data.filter((asset: any) => asset.year == selectedDecade)
-  //     }
-  //     // setSortedData(getData);
-  //     const sortedData = getData.slice().sort((a, b) => {
-  //       const columnValueA = a[sortColumn] ?? "";
-  //       const columnValueB = b[sortColumn] ?? "";
-  //       if (sortOrder === "asc") {
-  //         return columnValueA.localeCompare(columnValueB, undefined, {
-  //           numeric: true,
-  //         });
-  //       } else {
-  //         return columnValueB.localeCompare(columnValueA, undefined, {
-  //           numeric: true,
-  //         });
-  //       }
-  //     });
-  //     setSortedData(sortedData);
-  //   }
-  // }, [data, sortOrder, sortColumn, selectedLocation, selectedDecade]);
-
   const columnsName = [
     { label: "Asset", value: "asset_name" },
     { label: "Lat", value: "lat" },
@@ -152,55 +123,17 @@ const Problem2 = (props: any) => {
     { label: "Year", value: "year" },
   ];
 
-  const columns: GridColDef[] = [
-    { field: "asset_name", headerName: "Asset", width: 210 },
-    { field: "lat", headerName: "Lat", type: "number", width: 90 },
-    { field: "long", headerName: "Long", type: "number", width: 90 },
-    { field: "business_category", headerName: "Business Category", width: 130 },
-    {
-      field: "risk_rating",
-      headerName: "Risk Rating",
-      type: "number",
-      width: 90,
-    },
-    {
-      field: "risk_factors",
-      headerName: "Risk Factors",
-      sortable: false,
-      width: 210,
-      // valueGetter: (params: GridValueGetterParams) =>{
-      //   const riskFactors = JSON.parse(params.row.risk_factors);
-      //   const riskFactorKeys = Object.keys(riskFactors);
-      //   const riskFactorValues = Object.values(riskFactors);
-      //   var str = [];
-      //   for(let i = 0; i < riskFactorKeys.length; i++){
-      //     str.push(riskFactorKeys[i]+':'+riskFactorValues[i])
-      //   }
-      //   return str.join(', ');
-      // },
-    },
-    { field: "year", headerName: "Year", type: "number", width: 90 },
-  ];
-
-  const handleChangePage = (event: any, newPage: number) => {
+  const handleChangePage = ( event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: any) => {
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
   // console.log("data ", data)
-  const handleBlurFilter = (event: any) => {
-    // let data = getData();
-    // let filteredArr = getData();
-    // if(filter && filter.filterCol && filter.filterVal.trim() !== ""){
-    //   filteredArr = filteredArr.filter((ele:any)=>{
-    //     return ele[filter.filterCol].toLowerCase().includes( event.target.value.toLowerCase() )
-    //   })
-    // }
-    // setSortedData(filteredArr);
+  const handleBlurFilter = () => {
     if (filter && filter.filterCol) {
       setPage(0);
       setIsUpdatedFilterSort(true);
@@ -266,6 +199,7 @@ const Problem2 = (props: any) => {
                 .map((row, index) => (
                   <TableRow key={index}>
                     {columnsName.map((ele) => (
+                      //@ts-ignore
                       <TableCell key={ele.value}>{row[ele.value]}</TableCell>
                     ))}
                   </TableRow>
@@ -286,4 +220,4 @@ const Problem2 = (props: any) => {
   );
 };
 
-export default Problem2;
+export default DataTable;

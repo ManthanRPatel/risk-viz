@@ -16,46 +16,29 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
+import { DataRow } from "@/app/types/types";
+import { NextPage } from "next";
 
+interface MapProps {
+  data: DataRow[];
+  years: string[];
+  selectedDecade: number | null;
+  setSelectedDecade: React.Dispatch<React.SetStateAction<number | null>>;
+  setSelectedLocation: React.Dispatch<React.SetStateAction<[number, number] | null>>;
+}
 
-type RiskFactor = {
-  [key: string]: number;
-};
+const Map: NextPage<MapProps> = ({ data,
+  years,
+  selectedDecade,
+  setSelectedDecade,
+  setSelectedLocation}: MapProps) => {
 
-type Asset = {
-  assetName: string;
-  lat: number;
-  long: number;
-  businessCategory: string;
-  riskRating: number;
-  riskFactors: RiskFactor;
-  year: number;
-};
-
-type Problem1Props = {
-  data: Asset[];
-  years: number[];
-  selectedDecade: number;
-  setSelectedDecade: (decade: number) => void;
-  setSelectedLocation: (asset: Asset) => void;
-};
-
-const Problem1 = (props:any) => {
-  const {
-    data,
-    years,
-    selectedDecade,
-    setSelectedDecade,
-    setSelectedLocation,
-  } = props;
-
-  // console.log("props", props);
-  const [mounted, setMounted] = useState(false);
-  const [filteredData, setFilteredData] = useState<any[]>([]);
+  const [mounted, setMounted] = useState<boolean>(false);
+  const [filteredData, setFilteredData] = useState<DataRow[]>([]);
 
   useEffect(() => {
     setMounted(true);
-    const getData = data.filter((asset: any) => asset.year == selectedDecade);
+    const getData = data.filter((asset: DataRow) => Number(asset.year) == selectedDecade);
     setFilteredData(getData);
   }, [data, selectedDecade]);
 
@@ -100,9 +83,9 @@ const Problem1 = (props:any) => {
               <Select
                 labelId="demo-simple-select-autowidth-label"
                 id="demo-simple-select-autowidth"
-                value={selectedDecade}
-                onChange={(e: any) => {
-                  setSelectedDecade(e.target.value);
+                value={selectedDecade?.toString()}
+                onChange={(e: SelectChangeEvent) => {
+                  setSelectedDecade(Number(e.target.value));
                   setSelectedLocation(null);
                 }}
                 autoWidth
@@ -129,14 +112,9 @@ const Problem1 = (props:any) => {
               filteredData.map((item, idx) => (
                 <Marker
                   key={idx}
-                  position={[item.lat, item.long]}
-                  // color={getMarkerColor(item.riskRating)}
+                  position={[Number(item.lat),Number(item.long)]}
                   eventHandlers={{ click: () => handleMarkerClick(item) }}
-                  icon={getMarkerIcon(item.risk_rating)}
-                  // icon={icon({
-                  //   iconUrl: "/marker.png",
-                  //   iconSize: [32, 32],
-                  // })}
+                  icon={getMarkerIcon(Number(item.risk_rating))}
                 >
                   <Popup>
                     <div><b>Asset Name:</b> {item.asset_name}</div>
@@ -155,4 +133,4 @@ const Problem1 = (props:any) => {
   return null;
 };
 
-export default Problem1;
+export default Map;

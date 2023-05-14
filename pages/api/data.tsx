@@ -1,8 +1,9 @@
+import { DataRow } from "@/app/types/types";
 import csv from "csv-parser";
 import fs from "fs";
 import path from "path";
 
-function convertJSONString(jsonString:any) {
+function convertJSONString(jsonString: string) {
   const parsedJson = JSON.parse(jsonString);
   const keys = Object.keys(parsedJson);
   let result = '';
@@ -17,14 +18,14 @@ function convertJSONString(jsonString:any) {
 
 export default async function handler(req: any, res: any) {
   const filePath = path.join(process.cwd(), "./public/sample_data.csv");
-  const data: any[] = [];
+  const data: DataRow[] = [];
   const columnNames: string[] = [];
   let isFirstRow = true;
   let id = 0;
 
   fs.createReadStream(filePath)
     .pipe(csv())
-    .on("data", (row: any) => {
+    .on("data", (row: Record<string, string>) => {
       if (isFirstRow) {
         // Get the column names from the first row
         columnNames.push(...Object.keys(row));
