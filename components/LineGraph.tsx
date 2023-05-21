@@ -81,6 +81,8 @@ const LineChart: NextPage<LineChartProps> = ({ data, years, businessCategories, 
   const getChartData = (filteredData: DataRow[]): ChartData<'line'> => {
     setFilteredData(filteredData);
     let chartData: ChartData<'line'> = initialStateChartData;
+    filteredData = filteredData.sort((a:DataRow, b:DataRow) => Number(a.year) - Number(b.year) );
+    // console.log("filteredData ", filteredData.splice(0, 10))
     chartData = {
       labels: filteredData.map((item:DataRow) => item.year),
       datasets: [
@@ -169,7 +171,15 @@ const LineChart: NextPage<LineChartProps> = ({ data, years, businessCategories, 
         },
       },
     },
-    }
+    },
+    scales: {
+      x: {
+        ticks: {
+          autoSkip: true,
+          maxTicksLimit: 5,
+        },
+      },
+    },
   };
 
   return (
@@ -226,12 +236,12 @@ const LineChart: NextPage<LineChartProps> = ({ data, years, businessCategories, 
       {(selectedAsset || selectedBusinessCategory || selectedLocation) &&
         chartData &&
         data.length > 0 && (
-          <>
+          <div className="  ">
             <Line 
               options={options} 
               data={chartData} 
             />
-          </>
+          </div>
         )}
     </div>
   );

@@ -69,7 +69,7 @@ const Home: () => JSX.Element | null | undefined = () => {
   if (typeof window !== "undefined") {
     return (
       <div className=" p-4 ">
-        <Paper className="flex justify-center	p-8" elevation={3}>
+        <Paper className="flex justify-center	p-8 overflow-auto" elevation={3}>
           <div>
             <Map
               data={data}

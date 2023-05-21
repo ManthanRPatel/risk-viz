@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import "tailwindcss/tailwind.css";
 import {
   Table,
@@ -144,14 +143,6 @@ const DataTable: NextPage<TableProps> = ({  data, selectedDecade, selectedLocati
     <div className=" mt-6 ">
       <div className="text-xl font-bold">Data Table</div>
       <div className="text-lg my-2">{descriptionText}</div>
-      {/* <div style={{ height: 400, width: '100%' }}>
-      <DataGrid
-        rows={sortedData}
-        columns={columns}
-        // pageSize={5}
-        // rowsPerPageOptions={[5]}
-      />
-    </div> */}
 
       <TableContainer component={Paper}>
         <Table size="small" aria-label="simple table">
