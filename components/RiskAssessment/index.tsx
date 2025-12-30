@@ -21,7 +21,7 @@ const LineChart = dynamic(() => import("./LineGraph"), {
   ssr: false,
 });
 
-const Home = () => {
+const RiskAssessment = (): JSX.Element | null =>{
   const [mounted, setMounted] = useState<boolean>(false);
   const [data, setData] = useState<DataRow[]>([]);
   const [years, setYears] = useState<string[]>([]);
@@ -97,6 +97,7 @@ const Home = () => {
       </div>
     );
   }
+  return null;
 };
 
-export default Home;
+export default RiskAssessment;
