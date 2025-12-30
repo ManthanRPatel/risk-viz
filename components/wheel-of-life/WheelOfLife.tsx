@@ -156,8 +156,8 @@ export default function WheelOfLife({ items, size = 420 }: WheelOfLifeProps) {
         grid: { circular: true, color: "rgba(0,0,0,0.06)" },
         ticks: {
           display: false,
-          beginAtZero: true,
-          max: 10,
+          // min: 0,
+          // max: 10,
         },
         pointLabels: { display: true , font: { size: 16, weight: "400" }, color: "#666", },
       },
