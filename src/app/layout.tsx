@@ -12,6 +12,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+       <link rel="stylesheet" href="/compiled-tailwind.css" />
       <body>{children}</body>
     </html>
   )

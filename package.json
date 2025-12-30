@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest"
+    "test": "jest",
+    "build:css": "tailwindcss -i ./src/styles/tailwind.css -o ./public/compiled-tailwind.css --minify"
   },
   "dependencies": {
     "@emotion/react": "^11.10.6",
